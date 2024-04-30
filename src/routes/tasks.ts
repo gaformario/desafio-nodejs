@@ -79,6 +79,30 @@ async function createTask(userId: number, projectId: number, title: string, desc
   
     return updatedTask;
   }
+
+// Método para atualizar o status de uma tarefa
+async function updateTaskStatus(taskId: number, newStatus: TaskStatus): Promise<void> {
+
+    const task = await prisma.task.findUnique({
+        where: { id: taskId },
+    });
+
+    if (!task) {
+        throw new Error('Tarefa não encontrada.');
+    }
+
+    if (task.status === TaskStatus.Completed) {
+        throw new Error('Tarefas concluídas não podem ser editadas.');
+    }
+
+    await prisma.task.update({
+        where: { id: taskId },
+        data: {
+            status: newStatus,
+        },
+    });
+}
+
   
 // Rotas
 
@@ -93,17 +117,30 @@ router.post('/', async (req, res) => {
     }
   });
   
-  // Rota para alterar uma task
-  router.put('/:id', async (req, res) => {
-    const { userId } = req.body;
+// Rota para alterar uma task
+router.put('/:id', async (req, res) => {
+const { userId } = req.body;
+const { id } = req.params;
+const { title, description, tags, status } = req.body;
+try {
+    const updatedTask = await updateTask(userId, Number(id), title, description, tags, status);
+    res.json(updatedTask);
+} catch (error:any) {
+    res.status(500).json({ error: error.message });
+}
+});
+
+// Rota para atualizar o status da task
+router.put('/:id/status', async (req, res) => {
     const { id } = req.params;
-    const { title, description, tags, status } = req.body;
+    const { newStatus } = req.body;
+
     try {
-      const updatedTask = await updateTask(userId, Number(id), title, description, tags, status);
-      res.json(updatedTask);
+        await updateTaskStatus(Number(id), newStatus);
+        res.json({ message: 'Status da tarefa atualizado com sucesso.' });
     } catch (error:any) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  });
+});
 
 export default router;

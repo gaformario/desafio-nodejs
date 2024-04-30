@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import swaggerUi from 'swagger-ui-express';
+//import YAML from 'yamljs';
 
 // Importando rotas
 import userRoutes from './routes/users';
@@ -24,6 +26,12 @@ app.use('/tags', tagRoutes);
 app.get('/', (req, res) => {
   res.send('API do Task Manager');
 });
+
+// Carregar o arquivo Swagger
+//const swaggerDocument = YAML.load('./swagger.yaml'); 
+
+// Rota para servir a documentação Swagger
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const PORT = process.env.PORT || 3000;
 
