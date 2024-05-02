@@ -56,6 +56,19 @@ async function addMembers(userId, projectId, creatorId) {
         },
     });
 }
+// Método para listar todos os Projetos 
+async function listProjects(page, pageSize) {
+    try {
+        const projects = await prisma.project.findMany({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        });
+        return projects;
+    }
+    catch (error) {
+        throw new Error('Erro ao listar projetos');
+    }
+}
 // Método para remover um usuário de um projeto
 async function removeUserFromProject(userId, projectId, creatorId) {
     try {
@@ -87,6 +100,7 @@ async function removeUserFromProject(userId, projectId, creatorId) {
         throw new Error('Erro ao remover usuário do projeto: ' + error.message);
     }
 }
+// ROTAS
 // Rota para criar um novo projeto
 router.post('/', async (req, res) => {
     const { name, description, creatorId } = req.body;
@@ -98,19 +112,12 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-// Rota para listar todos os projetos
+// Rota para listar todos os projetos com paginação
 router.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
+    const pageSize = parseInt(req.query.pageSize) || 10; // Tamanho da página (padrão: 10)
     try {
-        const projects = await prisma.project.findMany({
-            include: {
-                members: {
-                    select: {
-                        id: true,
-                        name: true,
-                    }
-                }
-            }
-        });
+        const projects = await listProjects(page, pageSize);
         res.json(projects);
     }
     catch (error) {
@@ -141,7 +148,7 @@ router.delete('/:projectId', async (req, res) => {
     }
 });
 // Rota para adicionar um usuário como membro a um projeto
-router.post('/:projectId/members/:userId', async (req, res) => {
+router.post('/:projectId/add-members/:userId', async (req, res) => {
     const { projectId, userId } = req.params;
     const { creatorId } = req.body;
     try {
@@ -153,7 +160,7 @@ router.post('/:projectId/members/:userId', async (req, res) => {
     }
 });
 // Rota para deletar um usuário de um projeto
-router.delete('/:projectId/members/:userId', async (req, res) => {
+router.delete('/:projectId/remove-members/:userId', async (req, res) => {
     const { projectId, userId } = req.params;
     const { creatorId } = req.body;
     try {

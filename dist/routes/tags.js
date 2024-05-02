@@ -8,8 +8,17 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 // Método para obter todas as tags
-async function getAllTags() {
-    return prisma.tag.findMany();
+async function getAllTags(page, pageSize) {
+    try {
+        const tags = await prisma.tag.findMany({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        });
+        return tags;
+    }
+    catch (error) {
+        throw new Error("Erro ao buscar todas as tags");
+    }
 }
 // Método para obter uma tag pelo ID
 async function getTagById(id) {
@@ -30,15 +39,17 @@ async function deleteTag(id) {
         where: { id: id },
     });
 }
-// Rotas
-// Rota para listar as tags
+// ROTAS
+// Rota para listar as tags com paginação
 router.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
     try {
-        const tags = await getAllTags();
+        const tags = await getAllTags(page, pageSize);
         res.json(tags);
     }
     catch (error) {
-        res.status(500).json({ error: 'Erro ao buscar as tags' });
+        res.status(500).json({ error: error.message });
     }
 });
 // Rota para listar tag por ID da tag

@@ -31,13 +31,16 @@ async function createUser(name: string, email: string, password: string): Promis
   }
 
 // Método para listar todos os usuários
-async function listUsers(): Promise<any[]> {
-    try {
-        const users = await prisma.user.findMany();
-        return users;
-    } catch (error) {
-        throw new Error('Erro ao listar usuários');
-    }
+async function listUsers(page: number, pageSize: number): Promise<any[]> {
+  try {
+      const users = await prisma.user.findMany({
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+      });
+      return users;
+  } catch (error) {
+      throw new Error('Erro ao listar usuários');
+  }
 }
 
  // Método para designar o usuario responsavel pelo projeto
@@ -111,18 +114,21 @@ router.delete('/:userId', async (req, res) => {
     }
 });
 
-// Rota para listar todos os usuários
+// Rota para listagem de usuários com paginação
 router.get('/', async (req, res) => {
-    try {
-        const users = await listUsers();
-        res.json(users);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
+  const page = parseInt(req.query.page as string) || 1; 
+  const pageSize = parseInt(req.query.pageSize as string) || 10; 
+  
+  try {
+      const users = await listUsers(page, pageSize);
+      res.json(users);
+  } catch (error: any) {
+      res.status(500).json({ error: error.message });
+  }
 });
 
 // Rota para adicionar usuario inicial a um projeto
-router.post('/:projectId/members/:userId', async (req, res) => {
+router.post('/:projectId/add-members/:userId', async (req, res) => {
     try {
         const { projectId, userId} = req.params;
         await addUserIncial(Number(userId), Number(projectId));

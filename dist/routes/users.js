@@ -30,9 +30,12 @@ async function createUser(name, email, password) {
     });
 }
 // Método para listar todos os usuários
-async function listUsers() {
+async function listUsers(page, pageSize) {
     try {
-        const users = await prisma.user.findMany();
+        const users = await prisma.user.findMany({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        });
         return users;
     }
     catch (error) {
@@ -100,10 +103,12 @@ router.delete('/:userId', async (req, res) => {
         res.status(500).json({ error: 'Erro ao excluir usuário' });
     }
 });
-// Rota para listar todos os usuários
+// Rota para listagem de usuários com paginação
 router.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
     try {
-        const users = await listUsers();
+        const users = await listUsers(page, pageSize);
         res.json(users);
     }
     catch (error) {
@@ -111,7 +116,7 @@ router.get('/', async (req, res) => {
     }
 });
 // Rota para adicionar usuario inicial a um projeto
-router.post('/:projectId/members/:userId', async (req, res) => {
+router.post('/:projectId/add-members/:userId', async (req, res) => {
     try {
         const { projectId, userId } = req.params;
         await addUserIncial(Number(userId), Number(projectId));
