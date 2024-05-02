@@ -26,11 +26,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "email",
-                  "password"
-                ]
+                "required": ["name", "email", "password"]
               }
             }
           }
@@ -139,11 +135,7 @@
                     "type": "integer"
                   }
                 },
-                "required": [
-                  "name",
-                  "description",
-                  "creatorId"
-                ]
+                "required": ["name", "description", "creatorId"]
               }
             }
           }
@@ -233,9 +225,7 @@
                     "type": "integer"
                   }
                 },
-                "required": [
-                  "creatorId"
-                ]
+                "required": ["creatorId"]
               }
             }
           }
@@ -314,11 +304,7 @@
                     }
                   }
                 },
-                "required": [
-                  "userId",
-                  "projectId",
-                  "title"
-                ]
+                "required": ["userId", "projectId", "title"]
               }
             }
           }
@@ -373,11 +359,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "userId",
-                  "title",
-                  "status"
-                ]
+                "required": ["userId", "title", "status"]
               }
             }
           }
@@ -417,9 +399,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "newStatus"
-                ]
+                "required": ["newStatus"]
               }
             }
           }
@@ -459,9 +439,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "title"
-                ]
+                "required": ["title"]
               }
             }
           }
@@ -526,9 +504,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "title"
-                ]
+                "required": ["title"]
               }
             }
           }

@@ -14,7 +14,7 @@ async function createProject(name, description, creatorId) {
             where: { id: creatorId },
         });
         if (!creator) {
-            throw new Error('Usuário criador não encontrado');
+            throw new Error("Usuário criador não encontrado");
         }
         const newProject = await prisma.project.create({
             data: {
@@ -26,7 +26,7 @@ async function createProject(name, description, creatorId) {
         return newProject;
     }
     catch (error) {
-        throw new Error('Erro ao criar projeto: ' + error.message);
+        throw new Error("Erro ao criar projeto: " + error.message);
     }
 }
 // Método para adicionar um usuário como membro a um projeto
@@ -36,16 +36,16 @@ async function addMembers(userId, projectId, creatorId) {
         include: { members: true },
     });
     if (!project) {
-        throw new Error('Projeto não encontrado.');
+        throw new Error("Projeto não encontrado.");
     }
     if (!userId) {
-        throw new Error('Usuário não encontrado.');
+        throw new Error("Usuário não encontrado.");
     }
     if (project.members[0].id !== creatorId) {
-        throw new Error('Somente o criador do projeto pode adicionar membros.');
+        throw new Error("Somente o criador do projeto pode adicionar membros.");
     }
     if (project.members.some((member) => member.id === userId)) {
-        throw new Error('O usuário já é um membro deste projeto.');
+        throw new Error("O usuário já é um membro deste projeto.");
     }
     await prisma.project.update({
         where: { id: projectId },
@@ -56,7 +56,7 @@ async function addMembers(userId, projectId, creatorId) {
         },
     });
 }
-// Método para listar todos os Projetos 
+// Método para listar todos os Projetos
 async function listProjects(page, pageSize) {
     try {
         const projects = await prisma.project.findMany({
@@ -66,7 +66,7 @@ async function listProjects(page, pageSize) {
         return projects;
     }
     catch (error) {
-        throw new Error('Erro ao listar projetos');
+        throw new Error("Erro ao listar projetos");
     }
 }
 // Método para remover um usuário de um projeto
@@ -78,10 +78,10 @@ async function removeUserFromProject(userId, projectId, creatorId) {
             },
         });
         if (!project) {
-            throw new Error('Projeto não encontrado');
+            throw new Error("Projeto não encontrado");
         }
         if (project.creatorId !== creatorId) {
-            throw new Error('Apenas o criador do projeto pode remover membros');
+            throw new Error("Apenas o criador do projeto pode remover membros");
         }
         await prisma.project.update({
             where: {
@@ -97,23 +97,23 @@ async function removeUserFromProject(userId, projectId, creatorId) {
         });
     }
     catch (error) {
-        throw new Error('Erro ao remover usuário do projeto: ' + error.message);
+        throw new Error("Erro ao remover usuário do projeto: " + error.message);
     }
 }
 // ROTAS
 // Rota para criar um novo projeto
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
     const { name, description, creatorId } = req.body;
     try {
         const newProject = await createProject(name, description, creatorId);
-        res.status(201).json({ message: 'Projeto criado com sucesso' });
+        res.status(201).json({ message: "Projeto criado com sucesso" });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 // Rota para listar todos os projetos com paginação
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
     const pageSize = parseInt(req.query.pageSize) || 10; // Tamanho da página (padrão: 10)
     try {
@@ -125,7 +125,7 @@ router.get('/', async (req, res) => {
     }
 });
 // Rota para excluir um projeto pelo ID
-router.delete('/:projectId', async (req, res) => {
+router.delete("/:projectId", async (req, res) => {
     const projectId = parseInt(req.params.projectId);
     try {
         const project = await prisma.project.findUnique({
@@ -134,38 +134,40 @@ router.delete('/:projectId', async (req, res) => {
             },
         });
         if (!project) {
-            return res.status(404).json({ error: 'Projeto não encontrado' });
+            return res.status(404).json({ error: "Projeto não encontrado" });
         }
         await prisma.project.delete({
             where: {
                 id: projectId,
             },
         });
-        res.json({ message: 'Projeto excluído com sucesso' });
+        res.json({ message: "Projeto excluído com sucesso" });
     }
     catch (error) {
-        res.status(500).json({ error: 'Erro ao excluir projeto' });
+        res.status(500).json({ error: "Erro ao excluir projeto" });
     }
 });
 // Rota para adicionar um usuário como membro a um projeto
-router.post('/:projectId/add-members/:userId', async (req, res) => {
+router.post("/:projectId/add-members/:userId", async (req, res) => {
     const { projectId, userId } = req.params;
     const { creatorId } = req.body;
     try {
         await addMembers(Number(userId), Number(projectId), Number(creatorId));
-        res.status(200).json({ message: 'Usuário adicionado ao projeto com sucesso' });
+        res
+            .status(200)
+            .json({ message: "Usuário adicionado ao projeto com sucesso" });
     }
     catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
 // Rota para deletar um usuário de um projeto
-router.delete('/:projectId/remove-members/:userId', async (req, res) => {
+router.delete("/:projectId/remove-members/:userId", async (req, res) => {
     const { projectId, userId } = req.params;
     const { creatorId } = req.body;
     try {
         await removeUserFromProject(Number(userId), Number(projectId), creatorId);
-        res.json({ message: 'Usuário removido do projeto com sucesso' });
+        res.json({ message: "Usuário removido do projeto com sucesso" });
     }
     catch (error) {
         res.status(500).json({ error: error.message });

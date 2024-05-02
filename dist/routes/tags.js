@@ -41,7 +41,7 @@ async function deleteTag(id) {
 }
 // ROTAS
 // Rota para listar as tags com paginação
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     try {
@@ -53,45 +53,45 @@ router.get('/', async (req, res) => {
     }
 });
 // Rota para listar tag por ID da tag
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const tag = await getTagById(Number(id));
         if (!tag) {
-            res.status(404).json({ error: 'Tag não encontrada' });
+            res.status(404).json({ error: "Tag não encontrada" });
             return;
         }
         res.json(tag);
     }
     catch (error) {
-        res.status(500).json({ error: 'Erro ao buscar a tag' });
+        res.status(500).json({ error: "Erro ao buscar a tag" });
     }
 });
 // Rota para alterar a tag pelo ID
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
     try {
         const updatedTag = await updateTag(Number(id), title);
         if (!updatedTag) {
-            res.status(404).json({ error: 'Tag não encontrada' });
+            res.status(404).json({ error: "Tag não encontrada" });
             return;
         }
         res.json(updatedTag);
     }
     catch (error) {
-        res.status(500).json({ error: 'Erro ao atualizar a tag' });
+        res.status(500).json({ error: "Erro ao atualizar a tag" });
     }
 });
 // Rota para deletar a tag
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
     const { id } = req.params;
     try {
         await deleteTag(Number(id));
-        res.json({ message: 'Tag excluída com sucesso' });
+        res.json({ message: "Tag excluída com sucesso" });
     }
     catch (error) {
-        res.status(500).json({ error: 'Erro ao excluir a tag' });
+        res.status(500).json({ error: "Erro ao excluir a tag" });
     }
 });
 exports.default = router;

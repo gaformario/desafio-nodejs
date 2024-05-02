@@ -16,7 +16,7 @@ async function createUser(name, email, password) {
         },
     });
     if (usuarioExistente) {
-        throw new Error('Este email já está em uso.');
+        throw new Error("Este email já está em uso.");
     }
     // Hash da senha
     const passwordHash = await bcrypt_1.default.hash(password, 10);
@@ -39,7 +39,7 @@ async function listUsers(page, pageSize) {
         return users;
     }
     catch (error) {
-        throw new Error('Erro ao listar usuários');
+        throw new Error("Erro ao listar usuários");
     }
 }
 // Método para designar o usuario responsavel pelo projeto
@@ -48,13 +48,13 @@ async function addUserIncial(userId, projectId) {
         where: { id: userId },
     });
     if (!user) {
-        throw new Error('Usuário não encontrado na plataforma.');
+        throw new Error("Usuário não encontrado na plataforma.");
     }
     const project = await prisma.project.findUnique({
         where: { id: projectId },
     });
     if (!project) {
-        throw new Error('Projeto não encontrado.');
+        throw new Error("Projeto não encontrado.");
     }
     await prisma.project.update({
         where: { id: projectId },
@@ -67,18 +67,18 @@ async function addUserIncial(userId, projectId) {
 }
 // ROTAS
 // Rota para criar um novo usuário
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
     const { name, email, password } = req.body;
     try {
         await createUser(name, email, password);
-        res.status(201).json({ message: 'Usuário criado com sucesso' });
+        res.status(201).json({ message: "Usuário criado com sucesso" });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 // Rota para excluir um usuário pelo ID
-router.delete('/:userId', async (req, res) => {
+router.delete("/:userId", async (req, res) => {
     const userId = parseInt(req.params.userId);
     try {
         // Verifica se o usuário existe
@@ -88,7 +88,7 @@ router.delete('/:userId', async (req, res) => {
             },
         });
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado' });
+            return res.status(404).json({ error: "Usuário não encontrado" });
         }
         // Remove o usuário do banco de dados
         await prisma.user.delete({
@@ -96,15 +96,15 @@ router.delete('/:userId', async (req, res) => {
                 id: userId,
             },
         });
-        res.json({ message: 'Usuário excluído com sucesso' });
+        res.json({ message: "Usuário excluído com sucesso" });
     }
     catch (error) {
-        console.error('Erro ao excluir usuário:', error);
-        res.status(500).json({ error: 'Erro ao excluir usuário' });
+        console.error("Erro ao excluir usuário:", error);
+        res.status(500).json({ error: "Erro ao excluir usuário" });
     }
 });
 // Rota para listagem de usuários com paginação
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     try {
@@ -116,11 +116,11 @@ router.get('/', async (req, res) => {
     }
 });
 // Rota para adicionar usuario inicial a um projeto
-router.post('/:projectId/add-members/:userId', async (req, res) => {
+router.post("/:projectId/add-members/:userId", async (req, res) => {
     try {
         const { projectId, userId } = req.params;
         await addUserIncial(Number(userId), Number(projectId));
-        res.status(200).json({ message: 'Usuario adicionado com sucesso' });
+        res.status(200).json({ message: "Usuario adicionado com sucesso" });
     }
     catch (error) {
         res.status(400).json({ error: error.message });

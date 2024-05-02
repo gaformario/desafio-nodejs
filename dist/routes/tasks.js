@@ -14,13 +14,13 @@ async function createTask(userId, projectId, title, description, tags) {
         include: { members: true },
     });
     if (!projectWithMembers) {
-        throw new Error('Projeto não encontrado.');
+        throw new Error("Projeto não encontrado.");
     }
     if (!projectWithMembers.members.some((member) => member.id === userId)) {
-        throw new Error('Você não é membro deste projeto e não pode criar tarefas.');
+        throw new Error("Você não é membro deste projeto e não pode criar tarefas.");
     }
     if (!tags || tags.length === 0) {
-        throw new Error('As tarefas precisam ter pelo menos uma tag.');
+        throw new Error("As tarefas precisam ter pelo menos uma tag.");
     }
     const task = await prisma.task.create({
         data: {
@@ -31,7 +31,7 @@ async function createTask(userId, projectId, title, description, tags) {
             },
             user: { connect: { id: userId } },
             project: { connect: { id: projectId } },
-            status: client_1.TaskStatus.Pending
+            status: client_1.TaskStatus.Pending,
         },
     });
     return task;
@@ -43,16 +43,16 @@ async function updateTask(userId, taskId, title, description, tags, status) {
         include: { project: { include: { members: true } } },
     });
     if (!task) {
-        throw new Error('Tarefa não encontrada.');
+        throw new Error("Tarefa não encontrada.");
     }
     if (!task.project.members.some((member) => member.id === userId)) {
-        throw new Error('Você não é membro deste projeto e não pode editar tarefas.');
+        throw new Error("Você não é membro deste projeto e não pode editar tarefas.");
     }
-    if (task.status === 'Completed') {
-        throw new Error('Tarefas concluídas não podem ser editadas.');
+    if (task.status === "Completed") {
+        throw new Error("Tarefas concluídas não podem ser editadas.");
     }
     if (!tags || tags.length === 0) {
-        throw new Error('As tarefas precisam ter pelo menos uma tag.');
+        throw new Error("As tarefas precisam ter pelo menos uma tag.");
     }
     const updatedTask = await prisma.task.update({
         where: { id: taskId },
@@ -63,7 +63,7 @@ async function updateTask(userId, taskId, title, description, tags, status) {
                 deleteMany: {},
                 create: tags.map((tag) => ({ title: tag })),
             },
-            status
+            status,
         },
     });
     return updatedTask;
@@ -74,10 +74,10 @@ async function updateTaskStatus(taskId, newStatus) {
         where: { id: taskId },
     });
     if (!task) {
-        throw new Error('Tarefa não encontrada.');
+        throw new Error("Tarefa não encontrada.");
     }
     if (task.status === client_1.TaskStatus.Completed) {
-        throw new Error('Tarefas concluídas não podem ser editadas.');
+        throw new Error("Tarefas concluídas não podem ser editadas.");
     }
     await prisma.task.update({
         where: { id: taskId },
@@ -88,7 +88,7 @@ async function updateTaskStatus(taskId, newStatus) {
 }
 // Rotas
 // Rota para criar tasks e tags
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
     const { userId, projectId, title, description, tags } = req.body;
     try {
         const newTask = await createTask(userId, projectId, title, description, tags);
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
     }
 });
 // Rota para alterar uma task
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
     const { userId } = req.body;
     const { id } = req.params;
     const { title, description, tags, status } = req.body;
@@ -112,12 +112,12 @@ router.put('/:id', async (req, res) => {
     }
 });
 // Rota para atualizar o status da task
-router.put('/:id/status', async (req, res) => {
+router.put("/:id/status", async (req, res) => {
     const { id } = req.params;
     const { newStatus } = req.body;
     try {
         await updateTaskStatus(Number(id), newStatus);
-        res.json({ message: 'Status da tarefa atualizado com sucesso.' });
+        res.json({ message: "Status da tarefa atualizado com sucesso." });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
